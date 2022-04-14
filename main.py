@@ -1,10 +1,48 @@
 import random, time
 import tabulate
+import sys
+print(sys.setrecursionlimit(5000))
+
+def selection_sort(a):
+    for i in range(len(a)):
+        min_val = (a[i],i)
+        for j in range(i+1, len(a)):
+            if a[j] < min_val[0]:
+                min_val = (a[j],j)
+
+        a[i],a[min_val[1]] = min_val[0],a[i]
+    return a
+
+print(selection_sort([3,5,7,9,1,2,8,6,4]))
 
 
 def qsort(a, pivot_fn):
     ## TO DO
-    pass
+    if not a: return []
+    if len(a) == 1:
+        return [a[0]]
+    
+    pivot = pivot_fn(a)
+    left = [num for num in a if num < pivot]
+    right = [num for num in a if num > pivot]
+    return qsort(left,pivot_fn) + [pivot] +  qsort(right,pivot_fn)
+
+def fixed(a):
+    return a[0]
+
+print(qsort([3,5,7,9,1,2,8,6,4], fixed))
+
+def random_fn(a):
+    return random.choice(a)
+
+print(qsort([3,5,7,9,1,2,8,6,4], random_fn))
+
+def qsort_fixed(a):
+    return qsort(a, fixed)
+
+def qsort_random(a):
+    return qsort(a, random_fn)
+    
     
 def time_search(sort_fn, mylist):
     """
@@ -29,7 +67,8 @@ def time_search(sort_fn, mylist):
     return (time.time() - start) * 1000
     ###
 
-def compare_sort(sizes=[100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000]):
+
+def compare_sort(sizes=[10,100, 200, 500, 800 , 1000,1200, 1500,1800, 2000]):
     """
     Compare the running time of different sorting algorithms.
 
@@ -40,9 +79,9 @@ def compare_sort(sizes=[100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 10
       for each method to run on each value of n
     """
     ### TODO - sorting algorithms for comparison
-    qsort_fixed_pivot = # 
-    qsort_random_pivot = #
-    tim_sort = #
+    qsort_fixed_pivot = qsort_fixed
+    qsort_random_pivot = qsort_random
+    tim_sort = sorted
     result = []
     for size in sizes:
         # create list in ascending order
@@ -51,8 +90,11 @@ def compare_sort(sizes=[100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 10
         #random.shuffle(mylist)
         result.append([
             len(mylist),
+            
             time_search(qsort_fixed_pivot, mylist),
+            time_search(selection_sort, mylist),
             time_search(qsort_random_pivot, mylist),
+            time_search(tim_sort, mylist)
         ])
     return result
     ###
@@ -60,7 +102,7 @@ def compare_sort(sizes=[100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 10
 def print_results(results):
     """ change as needed for comparisons """
     print(tabulate.tabulate(results,
-                            headers=['n', 'qsort-fixed-pivot', 'qsort-random-pivot'],
+                            headers=['n', 'qsort-fixed-pivot','ss', 'qsort-random-pivot','tim_sort'],
                             floatfmt=".3f",
                             tablefmt="github"))
 
